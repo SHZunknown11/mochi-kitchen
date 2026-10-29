@@ -91,6 +91,8 @@ function normalizeName(raw) {
 }
 
 function aisleFor(key) {
+  // Stocks, sauces and pastes live in the pantry aisle even when named after a protein ("chicken stock").
+  if (/\b(broth|stock|sauce|dashi|paste|powder)\b/.test(key)) return 'pantry';
   for (const [aisle, terms] of AISLES) {
     if (terms.some((t) => new RegExp(`\\b${t}\\b`).test(key))) return aisle;
   }

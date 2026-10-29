@@ -3,6 +3,8 @@ const { sequelize, Recipe, Ingredient } = require('../models');
 const { classifyIngredients, estimateCalories } = require('./diet');
 const { parseMeasure } = require('./grocery');
 
+const MAX_PLAUSIBLE_KCAL = 1400;
+
 const withIngredients = { include: [{ model: Ingredient, order: [['id', 'ASC']] }], order: [[Ingredient, 'id', 'ASC']] };
 
 /**
@@ -19,6 +21,8 @@ async function saveRecipe(dto) {
   let caloriesSource = calories !== null ? 'ai' : null;
   if (calories === null) {
     calories = estimateCalories(dto.ingredients, dto.servings || 4);
+    // Free-text measures can be wildly off; an implausible per-serving figure is better left unknown.
+    if (calories !== null && calories > MAX_PLAUSIBLE_KCAL) calories = null;
     caloriesSource = calories !== null ? 'estimate' : null;
   }
 
