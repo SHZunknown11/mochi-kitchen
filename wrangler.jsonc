@@ -6,6 +6,12 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
 
+  // Run the Worker next to its D1 database (Tokyo, NRT) instead of next to each visitor: a search makes
+  // dozens of small queries, and each one costs ~250 ms when the Worker and the database are on different
+  // continents. If you create the database in another region, change this to match
+  // (`npx wrangler d1 execute mochi-kitchen --remote --json --command "SELECT 1"` shows served_by_colo).
+  "placement": { "region": "aws:ap-northeast-1" },
+
   // The front end (public/) is served by Cloudflare's asset hosting; only /api/* runs the Worker.
   "assets": {
     "directory": "./public",
