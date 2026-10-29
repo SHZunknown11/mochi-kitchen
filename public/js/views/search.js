@@ -113,7 +113,7 @@ export function searchView(root) {
       h('div', { class: 'provider', role: 'group', 'aria-label': 'Recipe source' },
         providerBtn('free', 'Free recipes', 'search'),
         providerBtn('ai', 'Mochi AI', 'sparkles', !state.aiConfigured,
-          state.aiConfigured ? 'Ask the Gemini AI chef for ideas' : 'Add your Gemini key to .env to switch this on')),
+          state.aiConfigured ? 'Ask the Gemini AI chef for ideas' : 'AI mode is not switched on (no Gemini key set)')),
     );
   }
 

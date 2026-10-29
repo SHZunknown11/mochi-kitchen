@@ -60,7 +60,7 @@ export async function plannerView(root) {
         h('button', { type: 'button', 'aria-pressed': 'true', id: 'pf', onClick: (e) => { opts.provider = 'free'; e.currentTarget.setAttribute('aria-pressed', 'true'); root.querySelector('#pa').setAttribute('aria-pressed', 'false'); } }, icon('calendar'), 'Free'),
         h('button', {
           type: 'button', 'aria-pressed': 'false', id: 'pa', disabled: !state.aiConfigured,
-          title: state.aiConfigured ? '' : 'Add your Gemini key to .env to switch this on',
+          title: state.aiConfigured ? '' : 'AI mode is not switched on (no Gemini key set)',
           onClick: (e) => { opts.provider = 'ai'; e.currentTarget.setAttribute('aria-pressed', 'true'); root.querySelector('#pf').setAttribute('aria-pressed', 'false'); },
         }, icon('sparkles'), 'Mochi AI')),
       h('label', { class: 'pick' }, h('input', { type: 'checkbox', onChange: (e) => { opts.usePantry = e.target.checked; } }), 'Prefer my pantry'),

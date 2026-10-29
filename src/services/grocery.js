@@ -91,11 +91,16 @@ function normalizeName(raw) {
   return { display, key };
 }
 
+const aisleRe = new Map();
 function aisleFor(key) {
   // Stocks, sauces and pastes live in the pantry aisle even when named after a protein ("chicken stock").
   if (/\b(broth|stock|sauce|dashi|paste|powder)\b/.test(key)) return 'pantry';
   for (const [aisle, terms] of AISLES) {
-    if (terms.some((t) => new RegExp(`\\b${t}\\b`).test(key))) return aisle;
+    if (terms.some((t) => {
+      let re = aisleRe.get(t);
+      if (!re) { re = new RegExp(`\\b${t}\\b`); aisleRe.set(t, re); }
+      return re.test(key);
+    })) return aisle;
   }
   return 'pantry';
 }

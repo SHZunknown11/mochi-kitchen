@@ -8,11 +8,19 @@ const { parseMeasure, normalizeName } = require('./grocery');
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// Building a RegExp is the expensive part of classifying a recipe, so each pattern is built once.
+const reCache = new Map();
+function cachedRe(source) {
+  let re = reCache.get(source);
+  if (!re) { re = new RegExp(source); reCache.set(source, re); }
+  return re;
+}
+
 /** True if `text` contains one of `terms` as a whole word/phrase, after removing `exceptions`. */
 function containsTerm(text, terms, exceptions = []) {
   let s = ` ${String(text).toLowerCase()} `;
   for (const ex of exceptions) s = s.split(ex).join(' ');
-  return terms.some((t) => new RegExp(`(?:^|[^a-z])${escapeRe(t)}(?:s|es)?(?:$|[^a-z])`).test(s));
+  return terms.some((t) => cachedRe(`(?:^|[^a-z])${escapeRe(t)}(?:s|es)?(?:$|[^a-z])`).test(s));
 }
 
 // Last words that turn an ingredient into something else: "rice vinegar" is not rice.
@@ -66,7 +74,7 @@ function lookupKcal(key) {
   if (KCAL_PER_100G[key] !== undefined) return { key, kcal: KCAL_PER_100G[key] };
   // The last word names the thing ("chicken stock" is a stock, not a chicken), so prefer a match
   // that ends the name; otherwise take the longest phrase found inside it.
-  const matches = Object.keys(KCAL_PER_100G).filter((k) => new RegExp(`(?:^|\\s)${escapeRe(k)}(?:$|\\s)`).test(key));
+  const matches = Object.keys(KCAL_PER_100G).filter((k) => cachedRe(`(?:^|\\s)${escapeRe(k)}(?:$|\\s)`).test(key));
   const endsWith = matches.filter((k) => key.endsWith(k));
   const pool = endsWith.length > 0 ? endsWith : matches;
   const best = pool.sort((a, b) => b.length - a.length)[0] || null;

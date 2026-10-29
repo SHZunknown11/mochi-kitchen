@@ -3,21 +3,7 @@ const { cached } = require('../cache');
 
 const BASE = 'https://www.thecocktaildb.com/api/json/v1/1';
 
-function normalizeDrink(d) {
-  const ingredients = [];
-  for (let i = 1; i <= 15; i += 1) {
-    const name = d[`strIngredient${i}`];
-    if (name) ingredients.push({ name: String(name).trim(), measure: String(d[`strMeasure${i}`] || '').trim() });
-  }
-  return {
-    id: String(d.idDrink),
-    name: String(d.strDrink || '').trim(),
-    thumb: d.strDrinkThumb || null,
-    glass: d.strGlass || null,
-    instructions: String(d.strInstructions || '').trim(),
-    ingredients,
-  };
-}
+const { normalizeDrink } = require('./normalizeDrink');
 
 async function nonAlcoholicList() {
   const json = await cached('cocktaildb:non-alcoholic', () => fetchJson(`${BASE}/filter.php?a=Non_Alcoholic`));
