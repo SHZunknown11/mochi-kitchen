@@ -19,6 +19,28 @@ describe('SQLite connection settings', () => {
   });
 });
 
+describe('concurrent writes on a real SQLite file', () => {
+  const os = require('os');
+  const path = require('path');
+  const fs = require('fs');
+  const { DataTypes } = require('sequelize');
+
+  test('many overlapping findOrCreate calls all succeed (no SQLITE_BUSY)', async () => {
+    const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'mochi-')), 'concurrent.sqlite');
+    const db = sequelize.build({ dialect: 'sqlite', storage: file });
+    const Pet = db.define('Pet', { name: { type: DataTypes.STRING, unique: true } });
+    await db.sync();
+    try {
+      const names = Array.from({ length: 30 }, (_, i) => `pet${i % 10}`); // duplicates on purpose
+      const results = await Promise.all(names.map((name) => Pet.findOrCreate({ where: { name } })));
+      expect(results).toHaveLength(30);
+      expect(await Pet.count()).toBe(10);
+    } finally {
+      await db.close();
+    }
+  });
+});
+
 describe('migrations', () => {
   test('up creates every table, and down removes them again', async () => {
     const migrator = createMigrator();

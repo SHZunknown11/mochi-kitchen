@@ -2,8 +2,8 @@ node_modules/
 .env
 .env.*
 !.env.example
-data/*.sqlite
-data/*.sqlite-journal
+data/*.sqlite*
+data/*.db*
 coverage/
 *.log
 .DS_Store
