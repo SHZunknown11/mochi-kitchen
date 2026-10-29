@@ -12,7 +12,16 @@ const withIngredients = { include: [{ model: Ingredient, order: [['id', 'ASC']] 
  * our own classifier so every source is judged the same way. If the recipe already exists
  * (same source + externalId) the stored copy is returned unchanged.
  */
-async function saveRecipe(dto) {
+let writeQueue = Promise.resolve();
+
+/** Save one recipe at a time. SQLite has a single writer anyway, and this avoids overlapping transactions. */
+function saveRecipe(dto) {
+  const run = writeQueue.then(() => doSave(dto));
+  writeQueue = run.catch(() => {});
+  return run;
+}
+
+async function doSave(dto) {
   const existing = await Recipe.findOne({ where: { source: dto.source, externalId: dto.externalId }, ...withIngredients });
   if (existing) return existing;
 

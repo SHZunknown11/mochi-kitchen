@@ -1,5 +1,6 @@
 const { NounInflector } = require('../utils/natural');
 const { AISLES } = require('../data/ingredients');
+const { DENSITY_G_PER_ML } = require('../data/kcal');
 
 const inflector = new NounInflector();
 
@@ -130,6 +131,14 @@ function aggregate(lines) {
       ? parseMeasure(line.measure)
       : parseMeasure(`${line.quantity ?? ''} ${line.unit ?? ''}`.trim());
 
+    // A cup of flour is weight you buy, not millilitres: known dry/solid foods are converted to
+    // grams so "1 cup flour" and "200 g flour" land on the same shopping line.
+    const density = DENSITY_G_PER_ML[key];
+    if (parsed.family === 'volume' && density && parsed.base !== null) {
+      parsed.family = 'mass';
+      parsed.base *= density;
+    }
+
     const group = parsed.family === 'count' ? `count:${parsed.unit || ''}` : parsed.family || 'none';
     const id = `${key}|${group}`;
     const bucket = buckets.get(id) || { display, key, group, family: parsed.family, unit: parsed.unit, total: 0, lines: 0, hasQty: false };
@@ -159,12 +168,14 @@ function aggregate(lines) {
       let unit = r.unit;
       if (r.hasQty) {
         quantity = r.total;
-        if (r.family === 'mass') [quantity, unit] = r.total >= 1000 ? [r.total / 1000, 'kg'] : [r.total, 'g'];
+        if (r.family === 'mass') {
+          [quantity, unit] = r.total >= 1000 ? [r.total / 1000, 'kg'] : [Math.round(r.total / 5) * 5 || r.total, 'g'];
+        }
         if (r.family === 'volume') {
           if (r.total >= 1000) [quantity, unit] = [r.total / 1000, 'l'];
-          else if (r.total < 15) [quantity, unit] = [r.total / 5, 'tsp'];
-          else if (r.total < 60) [quantity, unit] = [r.total / 15, 'tbsp'];
-          else [quantity, unit] = [r.total, 'ml'];
+          else if (r.total < 15) [quantity, unit] = [Math.round((r.total / 5) * 4) / 4, 'tsp']; // quarters read like a recipe
+          else if (r.total < 60) [quantity, unit] = [Math.round((r.total / 15) * 4) / 4, 'tbsp'];
+          else [quantity, unit] = [Math.round(r.total), 'ml'];
         }
         quantity = round(quantity);
       }

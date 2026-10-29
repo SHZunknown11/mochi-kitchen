@@ -1,6 +1,6 @@
 const express = require('express');
 const { Recipe, Ingredient, GroceryList, GroceryItem } = require('../models');
-const { aggregate } = require('../services/grocery');
+const { aggregate, formatAmount } = require('../services/grocery');
 const { validate } = require('../middleware/validate');
 const { requireAuth } = require('../middleware/auth');
 const { AppError } = require('../middleware/error');
@@ -14,6 +14,7 @@ const itemJson = (i) => ({
   name: i.name,
   quantity: i.quantity,
   unit: i.unit,
+  amount: formatAmount(i.quantity, i.unit),
   aisle: i.aisle,
   checked: i.checked,
 });

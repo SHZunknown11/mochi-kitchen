@@ -90,6 +90,27 @@ describe('aggregate (grocery list)', () => {
     expect(aggregate([{ name: 'oil', measure: '2 tbsp' }])[0]).toMatchObject({ quantity: 2, unit: 'tbsp' });
   });
 
+  test('cups of dry or solid foods become grams and merge with weighed amounts', () => {
+    // 1 cup flour = 240 ml x 0.52 g/ml = 124.8 g -> 125 g, plus 100 g = 225 g
+    const [flour] = aggregate([{ name: 'flour', measure: '1 cup' }, { name: 'Flour', measure: '100g' }]);
+    expect(flour).toMatchObject({ unit: 'g', quantity: 225 });
+    const list = aggregate([{ name: 'kimchi', measure: '300 g' }, { name: 'kimchi', measure: '1 cup' }]);
+    expect(list).toHaveLength(1);
+    expect(list[0].unit).toBe('g');
+  });
+
+  test('liquids with no density stay in volume', () => {
+    expect(aggregate([{ name: 'soy sauce', measure: '1 cup' }])[0]).toMatchObject({ unit: 'ml', quantity: 240 });
+  });
+
+  test('spoon amounts are rounded to quarters so they read like a recipe', () => {
+    // 1 + 1 + 1/3 tbsp = 35 ml = 2.33 tbsp, shown as 2.25
+    expect(aggregate([{ name: 'oil', measure: '1 tbsp' }, { name: 'oil', measure: '1 tbsp' }, { name: 'oil', measure: '1/3 tbsp' }])[0])
+      .toMatchObject({ unit: 'tbsp', quantity: 2.25 });
+    // 3 x 1/2 tsp = 1.5 tsp
+    expect(aggregate([1, 2, 3].map(() => ({ name: 'salt', measure: '1/2 tsp' })))[0]).toMatchObject({ unit: 'tsp', quantity: 1.5 });
+  });
+
   test('"to taste" folds into an existing row instead of adding a duplicate', () => {
     const list = aggregate([
       { name: 'Salt', measure: 'to taste' },
