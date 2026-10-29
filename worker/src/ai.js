@@ -3,7 +3,7 @@
 const core = require('../../src/services/geminiCore');
 
 const { AiUnavailableError } = core;
-const TIMEOUT_MS = 25000;
+const TIMEOUT_MS = 40000; // Gemini answers in 6-25 s; waiting on the network does not count as Worker CPU time
 
 const isConfigured = (env) => Boolean(env.GEMINI_API_KEY);
 
