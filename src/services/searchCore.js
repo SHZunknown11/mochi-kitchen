@@ -36,8 +36,8 @@ async function searchFree(parsed, { mealdb, saveRecipe }) {
   await Promise.all(ranked.map(([id, entry]) => track(entry.dto ? Promise.resolve(entry.dto) : mealdb.lookup(id),
     (dto) => { if (dto) dtos.push(dto); })));
 
-  const saved = [];
-  for (const dto of dtos) saved.push(await saveRecipe(dto));
+  // In parallel: each save is several database round trips, which add up when done one by one.
+  const saved = await Promise.all(dtos.map((dto) => saveRecipe(dto)));
   return { recipes: saved, unavailable: attempts > 0 && failures === attempts };
 }
 
