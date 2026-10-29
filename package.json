@@ -12,9 +12,24 @@
     "setup": "npm run migrate && npm run seed",
     "lint": "eslint .",
     "test": "jest --runInBand",
-    "test:coverage": "jest --runInBand --coverage"
+    "test:coverage": "jest --runInBand --coverage",
+    "seed:sql": "node scripts/build-seed.js",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy",
+    "d1:migrate:local": "wrangler d1 migrations apply mochi-kitchen --local",
+    "d1:seed:local": "wrangler d1 execute mochi-kitchen --local --file worker/seed.sql",
+    "d1:migrate": "wrangler d1 migrations apply mochi-kitchen --remote",
+    "d1:seed": "wrangler d1 execute mochi-kitchen --remote --file worker/seed.sql",
+    "d1:backup": "node scripts/backup-d1.js",
+    "deploy": "node scripts/deploy.js"
   },
-  "keywords": ["recipe", "nlp", "gemini", "express", "sequelize"],
+  "keywords": [
+    "recipe",
+    "nlp",
+    "gemini",
+    "express",
+    "sequelize"
+  ],
   "license": "MIT",
   "type": "commonjs",
   "engines": {
@@ -28,7 +43,9 @@
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
+    "hono": "^4.13.14",
     "joi": "^18.3.1",
+    "jose": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
     "natural": "^8.2.6",
     "sequelize": "^6.37.8",
@@ -39,11 +56,19 @@
     "eslint": "^10.13.0",
     "globals": "^16.0.0",
     "jest": "^30.5.2",
-    "supertest": "^7.3.1"
+    "supertest": "^7.3.1",
+    "wrangler": "^4.155.0"
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"],
-    "collectCoverageFrom": ["src/**/*.js", "!src/server.js", "!src/db/migrate.js", "!src/db/seed.js"]
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js",
+      "!src/db/migrate.js",
+      "!src/db/seed.js"
+    ]
   }
 }

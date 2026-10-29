@@ -1,7 +1,7 @@
 const globals = require('globals');
 
 module.exports = [
-  { ignores: ['node_modules/**', 'coverage/**', 'public/**'] },
+  { ignores: ['node_modules/**', 'coverage/**', 'public/**', '.wrangler/**', 'worker/src/index.mjs'] },
   {
     files: ['**/*.js'],
     languageOptions: {
