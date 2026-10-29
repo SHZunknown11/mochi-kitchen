@@ -21,7 +21,7 @@ Built as a Full Stack Development II project (Node.js, Express, Sequelize, SQLit
 
 ## Live on Cloudflare (free)
 
-**Live app:** _paste your `https://mochi-kitchen.<your-subdomain>.workers.dev` link here after the first deploy._
+**Live app:** https://mochi-kitchen.mochi-kitchen.workers.dev
 
 The same app also runs on Cloudflare Workers: `worker/` is a Hono API on **Cloudflare D1** (SQLite), and `public/` is served as static assets from the same Worker. The Express + Sequelize app in `src/` stays for local use; both share the pure logic (NLP, diet rules, grocery merging, scoring, planner) so behaviour is identical.
 
@@ -60,14 +60,16 @@ Local Worker: copy the secrets into a git-ignored `.dev.vars` file, then `npm ru
 
 - Workers Free: 100,000 requests per day, **10 ms CPU time per request** (waiting on the network or D1 is not counted), 50 external subrequests per request.
 - D1 Free: 5 million rows read per day, 100,000 rows written per day, 5 GB storage.
-- Password hashing (PBKDF2, 100,000 iterations) takes about 19 to 25 ms of CPU in a Node benchmark, so it may exceed the 10 ms budget on the free plan. If login or sign-up fails with error 1102 after deploying, lower `PBKDF2_ITERATIONS` (for example 20000) in `wrangler.jsonc` and run `npm run cf:deploy`, or move to the $5/month Workers Paid plan.
+- Measured on the live Worker with `wrangler tail` (29 Oct 2026): a first, cold sign-up used 42 ms CPU and a cold login 23 ms, both finished with outcome `ok`; warm requests used 1 to 2 ms, and searches 26 to 32 ms. All of these are above the documented 10 ms limit yet none was rejected, so the limit did not bite in practice, but Cloudflare does not promise this. Treat it as a risk, not a guarantee.
+- Placement: the D1 database lives in Tokyo (`served_by_colo: NRT`). `wrangler.jsonc` pins the Worker next to it (`placement.region`), because a search makes dozens of small queries and each one cost about 250 ms when the Worker ran on another continent (searches took up to 40 s before; now about 1 to 4 s).
+- Password hashing (PBKDF2, 100,000 iterations) takes about 19 to 25 ms of CPU in a Node benchmark. If login or sign-up fails with error 1102 after deploying, lower `PBKDF2_ITERATIONS` (for example 20000) in `wrangler.jsonc` and run `npm run cf:deploy`, or move to the $5/month Workers Paid plan.
 
 ## Quick start
 
 You need [Node.js](https://nodejs.org) 20 or newer.
 
 ```bash
-git clone https://github.com/<your-account>/mochi-kitchen.git
+git clone https://github.com/SHZunknown11/mochi-kitchen.git
 cd mochi-kitchen
 npm install
 cp .env.example .env        # Windows: copy .env.example .env

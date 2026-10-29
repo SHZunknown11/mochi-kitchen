@@ -11,3 +11,4 @@ Thumbs.db
 .dev.vars
 .wrangler/
 worker/backups/
+e2e-shots/
