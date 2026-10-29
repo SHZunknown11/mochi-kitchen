@@ -1,7 +1,9 @@
 const {
   MEAT, FISH, FISH_EXCEPTIONS, DAIRY, DAIRY_EXCEPTIONS, EGG, EGG_EXCEPTIONS, HONEY, GLUTEN, GLUTEN_EXCEPTIONS,
 } = require('../data/ingredients');
-const { KCAL_PER_100G, GRAMS_PER_PIECE, DEFAULT_KCAL_PER_100G, DEFAULT_GRAMS_PER_PIECE } = require('../data/kcal');
+const {
+  KCAL_PER_100G, GRAMS_PER_PIECE, DENSITY_G_PER_ML, DEFAULT_KCAL_PER_100G, DEFAULT_GRAMS_PER_PIECE,
+} = require('../data/kcal');
 const { parseMeasure, normalizeName } = require('./grocery');
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -51,10 +53,12 @@ function matchesPrefs(recipe, prefs = {}) {
 
 function lookupKcal(key) {
   if (KCAL_PER_100G[key] !== undefined) return { key, kcal: KCAL_PER_100G[key] };
-  let best = null;
-  for (const k of Object.keys(KCAL_PER_100G)) {
-    if (new RegExp(`(?:^|\\s)${escapeRe(k)}(?:$|\\s)`).test(key) && (!best || k.length > best.length)) best = k;
-  }
+  // The last word names the thing ("chicken stock" is a stock, not a chicken), so prefer a match
+  // that ends the name; otherwise take the longest phrase found inside it.
+  const matches = Object.keys(KCAL_PER_100G).filter((k) => new RegExp(`(?:^|\\s)${escapeRe(k)}(?:$|\\s)`).test(key));
+  const endsWith = matches.filter((k) => key.endsWith(k));
+  const pool = endsWith.length > 0 ? endsWith : matches;
+  const best = pool.sort((a, b) => b.length - a.length)[0] || null;
   return best ? { key: best, kcal: KCAL_PER_100G[best] } : { key, kcal: DEFAULT_KCAL_PER_100G };
 }
 
@@ -72,7 +76,8 @@ function estimateCalories(ingredients, servings = 4) {
 
     const { key: hit, kcal } = lookupKcal(key);
     let grams;
-    if (parsed.family === 'mass' || parsed.family === 'volume') grams = parsed.base;
+    if (parsed.family === 'mass') grams = parsed.base;
+    else if (parsed.family === 'volume') grams = parsed.base * (DENSITY_G_PER_ML[hit] ?? DENSITY_G_PER_ML[key] ?? 1);
     else grams = parsed.quantity * (GRAMS_PER_PIECE[hit] || DEFAULT_GRAMS_PER_PIECE);
     total += (grams * kcal) / 100;
     counted += 1;

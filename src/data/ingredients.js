@@ -39,14 +39,14 @@ const GLUTEN = [
   'noodle', 'ramen', 'udon', 'soba', 'soy sauce', 'couscous', 'barley', 'tortilla', 'pita',
   'bulgur', 'semolina', 'beer', 'seitan', 'biscuits', 'cake', 'gochujang', 'lasagne', 'lasagna',
   'macaroni', 'baguette', 'bun', 'buns', 'croissant', 'rye', 'spelt', 'farro', 'wonton wrappers',
-  'dumpling wrappers', 'gyoza wrappers', 'puff pastry', 'pastry', 'shortcrust',
+  'dumpling wrappers', 'gyoza wrappers', 'puff pastry', 'pastry', 'shortcrust', 'roux', 'teriyaki',
 ];
 const GLUTEN_EXCEPTIONS = [
   'rice noodles', 'rice noodle', 'glass noodles', 'glass noodle', 'rice flour', 'corn flour',
   'cornflour', 'corn starch', 'cornstarch', 'tamari', 'gluten-free', 'gluten free', 'buckwheat',
   'sweet potato noodles', 'potato flour', 'chickpea flour', 'almond flour', 'coconut flour',
   'rice paper', 'glutinous rice flour', 'shirataki noodles', 'konjac noodles', 'dangmyeon',
-  'tapioca flour', 'tapioca starch',
+  'tapioca flour', 'tapioca starch', 'rice cake', 'rice cakes', 'tteok',
 ];
 
 // Aisles for the grocery list. First match wins; anything else becomes "pantry".

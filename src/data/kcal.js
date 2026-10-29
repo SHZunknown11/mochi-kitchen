@@ -16,17 +16,28 @@ const KCAL_PER_100G = {
   nori: 35, avocado: 160, banana: 89, apple: 52, lemon: 29, chocolate: 546, 'red bean': 330,
   peanuts: 567, 'peanut butter': 588, sesame: 573, beans: 120, chickpeas: 164, lentils: 116,
   'matcha powder': 330, 'rice cake': 230, tteok: 230, 'rice flour': 360, 'corn starch': 381,
-  water: 0, broth: 10, stock: 10, dashi: 5, salt: 0, 'black pepper': 0,
+  water: 0, broth: 10, stock: 10, dashi: 5, salt: 0, 'black pepper': 0, 'shaved ice': 0, ice: 0,
+  'maple syrup': 260, 'condensed milk': 321, 'soy milk': 45, 'curry roux': 480,
 };
 
 const GRAMS_PER_PIECE = {
   egg: 50, eggs: 50, onion: 110, garlic: 5, carrot: 70, tomato: 120, potato: 170, 'sweet potato': 200,
   lemon: 60, banana: 120, apple: 180, avocado: 150, cucumber: 200, zucchini: 200, eggplant: 250,
   'spring onion': 15, scallion: 15, pepper: 120, mushroom: 20, 'rice cake': 30, tteok: 30,
-  'nori sheet': 3, nori: 3, 'chicken thigh': 120, 'chicken breast': 180,
+  'nori sheet': 3, nori: 3, 'chicken thigh': 120, 'chicken breast': 180, bacon: 10, bread: 30,
+  'fried tofu': 30, strawberry: 15, pork: 150, umeboshi: 8,
+};
+
+// Grams per millilitre for ingredients that are much lighter than water (cup measures of dry goods).
+const DENSITY_G_PER_ML = {
+  flour: 0.52, 'rice flour': 0.6, 'glutinous rice flour': 0.6, oats: 0.37, panko: 0.25, sugar: 0.85,
+  'brown sugar': 0.9, cabbage: 0.3, spinach: 0.15, kimchi: 0.6, 'bean sprouts': 0.35, 'shaved ice': 0.3,
+  walnuts: 0.45, 'red bean': 0.8, 'corn starch': 0.55, 'cooked rice': 0.65, 'matcha powder': 0.4,
 };
 
 const DEFAULT_KCAL_PER_100G = 110;
 const DEFAULT_GRAMS_PER_PIECE = 60;
 
-module.exports = { KCAL_PER_100G, GRAMS_PER_PIECE, DEFAULT_KCAL_PER_100G, DEFAULT_GRAMS_PER_PIECE };
+module.exports = {
+  KCAL_PER_100G, GRAMS_PER_PIECE, DENSITY_G_PER_ML, DEFAULT_KCAL_PER_100G, DEFAULT_GRAMS_PER_PIECE,
+};
