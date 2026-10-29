@@ -19,6 +19,49 @@ Built as a Full Stack Development II project (Node.js, Express, Sequelize, SQLit
 | **Drink pairing** | Non-alcoholic suggestion from [TheCocktailDB](https://www.thecocktaildb.com/api.php) |
 | **Security** | Joi validation on every input, rate limiting (general, login, AI), helmet + CSP, ownership checks, no raw user text in HTML |
 
+## Live on Cloudflare (free)
+
+**Live app:** _paste your `https://mochi-kitchen.<your-subdomain>.workers.dev` link here after the first deploy._
+
+The same app also runs on Cloudflare Workers: `worker/` is a Hono API on **Cloudflare D1** (SQLite), and `public/` is served as static assets from the same Worker. The Express + Sequelize app in `src/` stays for local use; both share the pure logic (NLP, diet rules, grocery merging, scoring, planner) so behaviour is identical.
+
+### Deploy (one command)
+
+```bash
+npm install
+npm run deploy      # logs in to Cloudflare, creates tables + 49 recipes, deploys, sets secrets
+```
+
+It is safe to re-run. JWT secrets are generated in memory and sent straight to Cloudflare; the Gemini key is typed at a prompt (or skipped). Nothing secret is written to a file.
+
+### Environment and secrets
+
+| Name | Where | Required | Purpose |
+|---|---|---|---|
+| `JWT_ACCESS_SECRET` | Worker secret | yes | signs 15-minute access tokens |
+| `JWT_REFRESH_SECRET` | Worker secret | yes | keys the hash used to store refresh tokens |
+| `GEMINI_API_KEY` | Worker secret | no | turns on "Mochi AI"; without it the app runs in free mode |
+| `GEMINI_MODEL` | `vars` in `wrangler.jsonc` | no | defaults to `gemini-flash-lite-latest` |
+| `PBKDF2_ITERATIONS` | `vars` in `wrangler.jsonc` | no | password hashing cost (default 100000, max 100000). Existing hashes keep working if you change it. |
+| `DB` | D1 binding | yes | the database (`mochi-kitchen`) |
+| `API_LIMITER`, `AI_LIMITER` | rate-limit bindings | yes | per-IP request limits |
+
+Local Worker: copy the secrets into a git-ignored `.dev.vars` file, then `npm run d1:migrate:local && npm run d1:seed:local && npm run cf:dev`.
+
+### Backups
+
+`npm run d1:backup` exports the live database (schema and data) to `worker/backups/` (git-ignored; it contains emails and password hashes). Restore into an empty database with `npx wrangler d1 execute mochi-kitchen --remote --file <backup.sql>`.
+
+### Checking a deployment
+
+`BASE_URL=https://your-url node scripts/e2e.js` drives the whole app in headless Chromium at 360x640 and 1280x800 (register, log in, search, recipe, favourite, shopping list, pantry, planner, log out), saves screenshots to `e2e-shots/`, and fails on console errors or sideways scrolling.
+
+### Free-plan limits that matter (Cloudflare docs, checked 29 Oct 2026)
+
+- Workers Free: 100,000 requests per day, **10 ms CPU time per request** (waiting on the network or D1 is not counted), 50 external subrequests per request.
+- D1 Free: 5 million rows read per day, 100,000 rows written per day, 5 GB storage.
+- Password hashing (PBKDF2, 100,000 iterations) takes about 19 to 25 ms of CPU in a Node benchmark, so it may exceed the 10 ms budget on the free plan. If login or sign-up fails with error 1102 after deploying, lower `PBKDF2_ITERATIONS` (for example 20000) in `wrangler.jsonc` and run `npm run cf:deploy`, or move to the $5/month Workers Paid plan.
+
 ## Quick start
 
 You need [Node.js](https://nodejs.org) 20 or newer.
