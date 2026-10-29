@@ -15,6 +15,17 @@ function containsTerm(text, terms, exceptions = []) {
   return terms.some((t) => new RegExp(`(?:^|[^a-z])${escapeRe(t)}(?:s|es)?(?:$|[^a-z])`).test(s));
 }
 
+// Last words that turn an ingredient into something else: "rice vinegar" is not rice.
+const PRODUCT_WORDS = new Set(['vinegar', 'sauce', 'oil', 'paste', 'stock', 'broth', 'powder', 'flour', 'starch', 'syrup', 'seeds']);
+
+/** Does the ingredient line `name` count as the wanted ingredient `term`? ("rice" matches "cooked rice", not "rice vinegar") */
+function ingredientMatches(name, term) {
+  if (!containsTerm(name, [term])) return false;
+  const words = String(name).toLowerCase().trim().split(/\s+/);
+  const last = words[words.length - 1];
+  return !(PRODUCT_WORDS.has(last) && !term.split(' ').includes(last));
+}
+
 /**
  * Classify a list of ingredient names. This is name-based, so it is a helpful guide and not a
  * guarantee (hidden ingredients in sauces can't be seen) - the UI says so.
@@ -87,4 +98,4 @@ function estimateCalories(ingredients, servings = 4) {
   return Math.max(50, Math.round(perServing / 5) * 5);
 }
 
-module.exports = { classifyIngredients, matchesPrefs, estimateCalories, containsTerm };
+module.exports = { classifyIngredients, matchesPrefs, estimateCalories, containsTerm, ingredientMatches };

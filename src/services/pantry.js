@@ -1,6 +1,6 @@
 const { Recipe, PantryItem } = require('../models');
 const { normalizeName } = require('./grocery');
-const { containsTerm, matchesPrefs } = require('./diet');
+const { ingredientMatches, matchesPrefs } = require('./diet');
 const { formatRecipe, withIngredients } = require('./recipeStore');
 
 // Things every kitchen has; they should not count against "can I cook this?".
@@ -8,7 +8,7 @@ const STAPLES = new Set(['salt', 'water', 'black pepper', 'ice', 'cooking oil', 
 
 /** Is `have` (a pantry entry) the same ingredient as `need` (a recipe line)? "chicken" covers "chicken thigh". */
 function covers(have, need) {
-  return have === need || containsTerm(need, [have]) || containsTerm(have, [need]);
+  return have === need || ingredientMatches(need, have) || ingredientMatches(have, need);
 }
 
 /**

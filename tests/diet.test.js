@@ -54,6 +54,33 @@ describe('containsTerm', () => {
   });
 });
 
+describe('ingredientMatches', () => {
+  const { ingredientMatches } = require('../src/services/diet');
+
+  test('a base ingredient matches its variants', () => {
+    expect(ingredientMatches('cooked rice', 'rice')).toBe(true);
+    expect(ingredientMatches('chicken thigh', 'chicken')).toBe(true);
+    expect(ingredientMatches('rice', 'rice')).toBe(true);
+  });
+
+  test('products made from it are different ingredients', () => {
+    expect(ingredientMatches('rice vinegar', 'rice')).toBe(false);
+    expect(ingredientMatches('sesame oil', 'sesame')).toBe(false);
+    expect(ingredientMatches('chicken stock', 'chicken')).toBe(false);
+  });
+
+  test('but asking for the product itself works', () => {
+    expect(ingredientMatches('rice vinegar', 'vinegar')).toBe(true);
+    expect(ingredientMatches('rice vinegar', 'rice vinegar')).toBe(true);
+    expect(ingredientMatches('soy sauce', 'soy sauce')).toBe(true);
+  });
+
+  test('unrelated names do not match', () => {
+    expect(ingredientMatches('butternut squash', 'butter')).toBe(false);
+    expect(ingredientMatches('tofu', 'rice')).toBe(false);
+  });
+});
+
 describe('matchesPrefs', () => {
   const vegan = { isVegan: true, isVegetarian: true, isGlutenFree: true, calories: 400 };
   const chicken = { isVegan: false, isVegetarian: false, isGlutenFree: false, calories: 650 };

@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { Recipe, Ingredient } = require('../models');
 const { extractKeywords } = require('./nlp');
-const { matchesPrefs, containsTerm } = require('./diet');
+const { matchesPrefs, containsTerm, ingredientMatches } = require('./diet');
 const { saveRecipe, formatRecipe, withIngredients } = require('./recipeStore');
 const mealdb = require('./providers/mealdb');
 const gemini = require('./gemini');
@@ -29,7 +29,7 @@ function scoreRecipe(recipe, parsed) {
   let score = 0;
 
   for (const ing of parsed.ingredients) {
-    if (names.some((n) => containsTerm(n, [ing]))) { score += 3; matched.push(ing); }
+    if (names.some((n) => ingredientMatches(n, ing))) { score += 3; matched.push(ing); }
     else if (containsTerm(title, [ing])) { score += 2; matched.push(ing); }
   }
   for (const k of [...parsed.other, ...parsed.mealTypes]) {
