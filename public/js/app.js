@@ -132,8 +132,9 @@ async function start() {
   if (hasSession()) {
     try {
       setUser((await api.get('/auth/me')).user);
-    } catch {
-      session.clear();
+    } catch (err) {
+      // Only a rejected login ends the session; a network blip must not log people out.
+      if (err.status === 401) session.clear();
     }
   }
   drawUser();

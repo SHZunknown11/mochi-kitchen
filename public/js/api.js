@@ -59,7 +59,9 @@ async function request(method, path, body, retry = true) {
     throw new ApiError(0, 'Cannot reach the server. Is it running?');
   }
 
-  if (res.status === 401 && retry && s && s.refreshToken && !path.startsWith('/auth/')) {
+  // /auth/me must be allowed to refresh: it is the first call after a page load, when the 15-minute access token has often expired.
+  const isCredentialCall = /^\/auth\/(login|register|refresh|logout)\b/.test(path);
+  if (res.status === 401 && retry && s && s.refreshToken && !isCredentialCall) {
     if (await refreshTokens()) return request(method, path, body, false);
     session.clear();
     window.dispatchEvent(new Event('mochi:logout'));
