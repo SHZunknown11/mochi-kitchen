@@ -26,7 +26,7 @@ describe('guards', () => {
 describe('favourites', () => {
   test('add, list, remove - and adding twice is harmless', async () => {
     const u = await registerUser(app);
-    const id = await idOf('Bibimbap');
+    const id = await idOf('Chicken Teriyaki');
 
     expect((await u.auth(request(app).post('/api/favourites')).send({ recipeId: id })).status).toBe(201);
     expect((await u.auth(request(app).post('/api/favourites')).send({ recipeId: id })).status).toBe(200);
@@ -34,7 +34,7 @@ describe('favourites', () => {
 
     const list = await u.auth(request(app).get('/api/favourites'));
     expect(list.body.favourites).toHaveLength(1);
-    expect(list.body.favourites[0]).toMatchObject({ title: 'Bibimbap', isFavourite: true });
+    expect(list.body.favourites[0]).toMatchObject({ title: 'Chicken Teriyaki', isFavourite: true });
     expect(list.body.favourites[0].ingredients.length).toBeGreaterThan(3);
 
     expect((await u.auth(request(app).delete(`/api/favourites/${id}`))).status).toBe(204);
@@ -60,7 +60,7 @@ describe('favourites', () => {
 describe('grocery lists', () => {
   test('merges and de-duplicates ingredients from several recipes', async () => {
     const u = await registerUser(app);
-    const ids = [await idOf('Bibimbap'), await idOf('Garden Vegan Bibimbap'), await idOf('Gyudon Beef Bowl')];
+    const ids = [await idOf('Kimchi Fried Rice'), await idOf('Garden Vegan Bibimbap'), await idOf('Oyakodon')];
     const res = await u.auth(request(app).post('/api/grocery')).send({ recipeIds: ids, name: 'Date night' });
     expect(res.status).toBe(201);
     expect(res.body.list.name).toBe('Date night');
@@ -71,9 +71,9 @@ describe('grocery lists', () => {
     expect(new Set(names).size).toBe(names.length); // no duplicates
     // rice ("cooked rice" loses its descriptor): 300 g + 300 g + 300 g = 900 g across the three recipes
     expect(items.find((i) => i.name === 'rice')).toMatchObject({ quantity: 900, unit: 'g', aisle: 'grains & noodles' });
-    // sesame oil appears in both bibimbaps: 1 tbsp + 1 tbsp
+    // sesame oil appears in Kimchi Fried Rice and Garden Vegan Bibimbap: 1 tbsp + 1 tbsp
     expect(items.find((i) => i.name === 'sesame oil')).toMatchObject({ quantity: 2, unit: 'tbsp' });
-    // gochujang: 1 tbsp in each of the two bibimbaps
+    // gochujang: 1 tbsp in Kimchi Fried Rice and 1 tbsp in Garden Vegan Bibimbap
     expect(items.find((i) => i.name === 'gochujang')).toMatchObject({ quantity: 2, unit: 'tbsp' });
   });
 
@@ -214,7 +214,7 @@ describe('meal planner', () => {
 
   test('uses Gemini when it is available and the answer only contains known recipes', async () => {
     const u = await registerUser(app);
-    const a = await idOf('Gyudon Beef Bowl');
+    const a = await idOf('Chicken Teriyaki');
     const b = await idOf('Kitsune Udon');
     gemini.setClient({ models: { generateContent: async () => ({ text: JSON.stringify([
       { day: 1, lunch: a, dinner: b, note: 'Warm <i>and</i> easy.' }, { day: 2, lunch: b, dinner: a, note: 'Enjoy!' }, { day: 3, lunch: a, dinner: a, note: '' },

@@ -31,6 +31,7 @@ function createApp() {
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/favourites', require('./routes/favourites'));
   app.use('/api/grocery', require('./routes/grocery'));
+  app.use('/api/java', require('./routes/javaService'));
   app.use('/api', require('./routes/recipes'));
   app.use('/api', require('./routes/kitchen'));
   app.use('/api', notFound);

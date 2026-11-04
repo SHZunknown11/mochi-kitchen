@@ -11,10 +11,10 @@ const meal = (id, name, extra = {}) => ({
 });
 
 describe('seed data', () => {
-  test('49 starter recipes with diet flags and calories', async () => {
+  test('45 starter recipes with diet flags and calories', async () => {
     const n = await w.DB.prepare('SELECT COUNT(*) c FROM recipes').first();
-    expect(n.c).toBe(49);
-    const vegan = await w.call('GET', '/api/recipes/4');
+    expect(n.c).toBe(45);
+    const vegan = await w.call('GET', '/api/recipes/3');
     expect(vegan.body.diet.vegan).toBe(true);
     expect(vegan.body.ingredients.length).toBeGreaterThan(2);
     expect(vegan.body.steps.length).toBeGreaterThan(1);
@@ -53,10 +53,10 @@ describe('search', () => {
   test('logged-in users get their saved diet profile and favourite flags', async () => {
     const u = await registerUser(w);
     await w.call('PATCH', '/api/auth/me', { token: u.accessToken, body: { dietPrefs: { diet: 'vegan', glutenFree: false, maxCalories: null } } });
-    await w.call('POST', '/api/favourites', { token: u.accessToken, body: { recipeId: 4 } });
+    await w.call('POST', '/api/favourites', { token: u.accessToken, body: { recipeId: 3 } });
     const res = await w.call('POST', '/api/search', { token: u.accessToken, body: { query: 'kimchi' } });
     expect(res.body.results.every((r) => r.diet.vegan)).toBe(true);
-    expect(res.body.results.find((r) => r.id === 4).isFavourite).toBe(true);
+    expect(res.body.results.find((r) => r.id === 3).isFavourite).toBe(true);
   });
 });
 

@@ -12,3 +12,5 @@ Thumbs.db
 .wrangler/
 worker/backups/
 e2e-shots/
+java-service/bin/
+java-service/target/

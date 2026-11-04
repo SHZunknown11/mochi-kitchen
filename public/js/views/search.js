@@ -1,13 +1,14 @@
 import { api } from '../api.js';
-import { h, clear, staticSvg, toast, plural } from '../ui.js';
+import { h, clear, toast, plural } from '../ui.js';
 import { state } from '../state.js';
-import { mochi } from '../art.js';
 import { icon, recipeCard, emptyState, loading } from '../components.js';
+import { mountReact } from '../react.js';
+import { KitchenLiveBar } from '../kitchenVibe.js';
 
 const SUGGESTIONS = [
   'cozy japanese dinner',
   'spicy vegan kimchi',
-  'something sweet and cute',
+  'a rich chocolate dessert',
   'chicken and rice under 600 calories',
   'gluten free noodles',
   'quick egg breakfast',
@@ -35,14 +36,14 @@ export function searchView(root) {
     const body = { mode: memo.mode, provider: memo.provider, diet: memo.diet };
     if (memo.mode === 'text') {
       memo.text = textInput.value.trim();
-      if (!memo.text) { toast('Tell Mochi what you feel like eating first.', 'bad'); textInput.focus(); return; }
+      if (!memo.text) { toast('Describe a dish or craving to get started.', 'bad'); textInput.focus(); return; }
       body.query = memo.text;
     }
     if (memo.mode === 'ingredients') {
       if (memo.ingredients.length === 0) { toast('Add at least one ingredient.', 'bad'); ingInput.focus(); return; }
       body.ingredients = memo.ingredients;
     }
-    clear(results).append(loading(memo.provider === 'ai' ? 'Mochi is asking the AI chef' : 'Mochi is rummaging through the recipe box'));
+    clear(results).append(loading(memo.provider === 'ai' ? 'Generating recipe ideas' : 'Searching the recipe collection'));
     try {
       memo.results = await api.post('/search', body);
       showResults();
@@ -58,8 +59,8 @@ export function searchView(root) {
 
     for (const code of data.notices) {
       const text = code === 'ai-unavailable'
-        ? 'The AI chef is napping right now, so these are from the free recipe books.'
-        : 'The free recipe service is not answering, so only recipes we already have are shown.';
+        ? 'AI suggestions are unavailable right now. Showing recipes from the free collection.'
+        : 'The free recipe service is unavailable. Showing recipes already in the collection.';
       results.append(h('div', { class: 'notice', role: 'status' }, icon('sparkles'), text));
     }
 
@@ -71,7 +72,7 @@ export function searchView(root) {
       data.prefs.maxCalories ? `under ${data.prefs.maxCalories} kcal` : null,
     ].filter(Boolean);
     if (heard.length || prefsText.length) {
-      results.append(h('p', { class: 'understood' }, 'Mochi understood: ',
+      results.append(h('p', { class: 'understood' }, 'Matched: ',
         ...[...heard, ...prefsText].flatMap((w, i) => [i ? ', ' : '', h('b', {}, w)])));
     }
 
@@ -112,7 +113,7 @@ export function searchView(root) {
       h('label', { class: 'kcal' }, icon('flame'), slider, kcalLabel),
       h('div', { class: 'provider', role: 'group', 'aria-label': 'Recipe source' },
         providerBtn('free', 'Free recipes', 'search'),
-        providerBtn('ai', 'Mochi AI', 'sparkles', !state.aiConfigured,
+        providerBtn('ai', 'AI suggestions', 'sparkles', !state.aiConfigured,
           state.aiConfigured ? 'Ask the Gemini AI chef for ideas' : 'AI mode is not switched on (no Gemini key set)')),
     );
   }
@@ -167,12 +168,16 @@ export function searchView(root) {
 
   drawTabs(); drawPanels(); drawFilters(); drawIngredients();
 
+  const kitchenBarHost = h('div', { class: 'kitchen-live-bar-container' });
+  mountReact(KitchenLiveBar, kitchenBarHost);
+
   root.append(h('section', { class: 'page' },
     h('div', { class: 'hero' },
       h('div', {},
-        h('h1', {}, h('span', { class: 'jp' }, '오늘 뭐 먹지? · 今日は何を食べる？'), 'What shall we cook today?'),
-        h('p', { class: 'muted' }, 'Describe a craving, list what is in your fridge, or just set your diet. Mochi finds matching recipes.')),
-      staticSvg(mochi('smile', 190))),
+        h('p', { class: 'eyebrow' }, 'Recipe finder & studio'),
+        h('h1', {}, 'Find your next great meal.'),
+        h('p', { class: 'muted' }, 'Search by craving, use what is already in your kitchen, or explore delicious beef-free recipes.'))),
+    kitchenBarHost,
     h('div', { class: 'card searchbox' }, tabsEl, panels.text, panels.ingredients, panels.diet, filterBox),
     results));
 

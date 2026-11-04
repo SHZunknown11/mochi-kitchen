@@ -1,8 +1,7 @@
 import { login, register, logout } from '../api.js';
 import { api } from '../api.js';
-import { h, clear, staticSvg, toast } from '../ui.js';
+import { h, clear, toast } from '../ui.js';
 import { setUser, state } from '../state.js';
-import { mochi } from '../art.js';
 import { icon, pageHead } from '../components.js';
 
 function safeNext(query) {
@@ -13,8 +12,6 @@ function safeNext(query) {
 export function loginView(root, _params, query) {
   let mode = 'login';
   const form = h('form', { class: 'card', novalidate: true });
-  const art = h('div', { class: 'auth-art' }, staticSvg(mochi('happy', 260)), h('p', { class: 'hand' }, 'おかえり! 어서 와요!'));
-
   function draw() {
     const error = h('p', { class: 'error-text', role: 'alert' });
     const field = (id, label, type, extra = {}) => h('div', { class: 'field' },
@@ -52,7 +49,7 @@ export function loginView(root, _params, query) {
     };
   }
   draw();
-  root.append(h('section', { class: 'page' }, h('div', { class: 'auth-grid' }, art, form)));
+  root.append(h('section', { class: 'page' }, h('div', { class: 'auth-grid' }, form)));
 }
 
 export function profileView(root) {

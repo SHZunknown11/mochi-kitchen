@@ -1,4 +1,4 @@
-// Hand-drawn (in code) kawaii illustrations. Every string here is static markup written by us,
+// Hand-drawn recipe illustrations. Every string here is static markup written by us,
 // never built from user text, so it is safe to insert with innerHTML.
 
 const INK = '#4A3B47';
@@ -15,41 +15,9 @@ const PALETTES = [
 ];
 export const palette = (n) => PALETTES[Math.abs(Number(n) || 0) % PALETTES.length];
 
-// ---------------------------------------------------------------- faces
-function eyes(mood) {
-  switch (mood) {
-    case 'happy':
-      return `<path d="M-17 0 q5 -7 10 0" fill="none" ${THIN}/><path d="M7 0 q5 -7 10 0" fill="none" ${THIN}/>`;
-    case 'sad':
-      return `<path d="M-17 -2 q5 6 10 0" fill="none" ${THIN}/><path d="M7 -2 q5 6 10 0" fill="none" ${THIN}/>
-        <path d="M-15 6 q-2 5 0 8" fill="#BFE3FF" ${THIN}/>`;
-    case 'sleepy':
-      return `<path d="M-17 0 h10" ${THIN}/><path d="M7 0 h10" ${THIN}/>`;
-    case 'wow':
-      return `<circle cx="-12" cy="0" r="5" fill="#fff" ${THIN}/><circle cx="12" cy="0" r="5" fill="#fff" ${THIN}/>
-        <circle cx="-12" cy="0" r="2" fill="${INK}"/><circle cx="12" cy="0" r="2" fill="${INK}"/>`;
-    default: // smile
-      return `<ellipse cx="-12" cy="0" rx="3.4" ry="4.4" fill="${INK}"/><ellipse cx="12" cy="0" rx="3.4" ry="4.4" fill="${INK}"/>
-        <circle cx="-13.2" cy="-1.6" r="1.2" fill="#fff"/><circle cx="10.8" cy="-1.6" r="1.2" fill="#fff"/>`;
-  }
-}
-
-function mouth(mood) {
-  if (mood === 'sad') return `<path d="M-4 12 q4 -4 8 0" fill="none" ${THIN}/>`;
-  if (mood === 'wow') return `<ellipse cx="0" cy="12" rx="3" ry="4" fill="#FF8FA8" ${THIN}/>`;
-  if (mood === 'sleepy') return `<path d="M-3 11 q3 3 6 0" fill="none" ${THIN}/>`;
-  return `<path d="M-6 9 q3 5 6 0 q3 5 6 0" fill="none" ${THIN}/>`;
-}
-
-/** A little face centred on (x, y). */
-function face(x, y, scale = 1, mood = 'smile') {
-  return `<g transform="translate(${x} ${y}) scale(${scale})">${eyes(mood)}
-    <ellipse cx="-21" cy="8" rx="6" ry="4" fill="#FF9EB5" opacity=".75"/><ellipse cx="21" cy="8" rx="6" ry="4" fill="#FF9EB5" opacity=".75"/>
-    ${mouth(mood)}</g>`;
-}
-
-const sparkle = (x, y, r = 7, fill = '#FFE066') =>
-  `<path d="M${x} ${y - r} Q${x + 1.5} ${y - 1.5} ${x + r} ${y} Q${x + 1.5} ${y + 1.5} ${x} ${y + r} Q${x - 1.5} ${y + 1.5} ${x - r} ${y} Q${x - 1.5} ${y - 1.5} ${x} ${y - r}Z" fill="${fill}" ${THIN}/>`;
+// ---------------------------------------------------------------- illustration details
+function face() { return ''; }
+const sparkle = () => '';
 
 const steam = (x, y) =>
   `<path d="M${x} ${y} q-5 -8 0 -14 q5 -6 0 -14" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".95"/>

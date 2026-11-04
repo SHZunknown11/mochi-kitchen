@@ -1,5 +1,5 @@
 import { h, staticSvg } from './ui.js';
-import { dishArt, mochi, palette, ICONS, doodles } from './art.js';
+import { dishArt, palette, ICONS, doodles } from './art.js';
 import { state, togglePick } from './state.js';
 import { toggleFavourite } from './actions.js';
 
@@ -66,15 +66,15 @@ export function recipeCard(recipe, { selectable = true } = {}) {
       h('div', { class: 'actions' }, pick, heartButton(recipe))));
 }
 
-export function emptyState(mood, title, text, ...actions) {
+export function emptyState(_mood, title, text, ...actions) {
   return h('div', { class: 'card empty' },
-    staticSvg(mochi(mood, 130)), h('h3', {}, title), text ? h('p', { class: 'muted' }, text) : null,
+    h('div', { class: 'empty-mark', 'aria-hidden': 'true' }, 'MK'), h('h3', {}, title), text ? h('p', { class: 'muted' }, text) : null,
     actions.length ? h('div', { class: 'row', style: 'justify-content:center' }, actions) : null);
 }
 
-export function loading(text = 'Mochi is looking') {
+export function loading(text = 'Loading') {
   return h('div', { class: 'loading', role: 'status' },
-    staticSvg(mochi('wow', 110)), h('p', { class: 'hand' }, text, h('span', { class: 'dots' })));
+    h('span', { class: 'loader', 'aria-hidden': 'true' }), h('p', {}, text, h('span', { class: 'dots' })));
 }
 
 export function pageHead(title, subtitle, jp) {

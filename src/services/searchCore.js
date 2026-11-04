@@ -8,6 +8,18 @@ const MAX_RESULTS = 24;
 const MAX_REMOTE_LOOKUPS = 10;
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
+function containsBeef(recipe) {
+  const text = `${recipe.title || ''} ${recipe.category || ''} ${recipe.summary || ''}`.toLowerCase();
+  if (/\b(beef|steak|brisket|veal|oxtail|bulgogi|gyudon)\b/.test(text)) return true;
+  if (recipe.ingredients) {
+    for (const ing of recipe.ingredients) {
+      const name = (typeof ing === 'string' ? ing : ing.name || '').toLowerCase();
+      if (/\b(beef|steak|brisket|veal|oxtail|minced beef)\b/.test(name)) return true;
+    }
+  }
+  return false;
+}
+
 /** TheMealDB lookups. Rejections are swallowed one by one so a single failure doesn't hide the rest. */
 async function searchFree(parsed, { mealdb, saveRecipe }) {
   const found = new Map(); // externalId -> { dto?, score }
@@ -37,7 +49,9 @@ async function searchFree(parsed, { mealdb, saveRecipe }) {
     (dto) => { if (dto) dtos.push(dto); })));
 
   // In parallel: each save is several database round trips, which add up when done one by one.
-  const saved = await Promise.all(dtos.map((dto) => saveRecipe(dto)));
+  // Never save any beef recipe into the database.
+  const beefFreeDtos = dtos.filter((dto) => !containsBeef(dto));
+  const saved = await Promise.all(beefFreeDtos.map((dto) => saveRecipe(dto)));
   return { recipes: saved, unavailable: attempts > 0 && failures === attempts };
 }
 
@@ -66,8 +80,10 @@ async function runSearch(deps, { mode = 'text', query = '', ingredients = [], di
     try {
       const ideas = await deps.suggestRecipes({ ...parsed, diet: prefs, maxCalories: prefs.maxCalories });
       for (const dto of ideas) {
-        const saved = await deps.saveRecipe(dto);
-        add(saved, 100, parsed.keywords, true);
+        if (!containsBeef(dto)) {
+          const saved = await deps.saveRecipe(dto);
+          add(saved, 100, parsed.keywords, true);
+        }
       }
     } catch (err) {
       if (!(err instanceof AiUnavailableError)) throw err;
@@ -91,7 +107,7 @@ async function runSearch(deps, { mode = 'text', query = '', ingredients = [], di
   }
 
   const list = [...results.values()]
-    .filter(({ recipe }) => matchesPrefs(recipe, prefs))
+    .filter(({ recipe }) => !containsBeef(recipe) && matchesPrefs(recipe, prefs))
     .sort((a, b) => b.score - a.score || a.recipe.title.localeCompare(b.recipe.title))
     .slice(0, MAX_RESULTS)
     .map(({ recipe, score, matched, ai }) => ({ ...formatRecipe(recipe), score, matched, ai }));

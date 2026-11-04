@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "start:all": "start-fullstack.bat",
     "dev": "node --watch src/server.js",
     "migrate": "node src/db/migrate.js up",
     "migrate:down": "node src/db/migrate.js down",
@@ -13,6 +14,9 @@
     "lint": "eslint .",
     "test": "jest --runInBand",
     "test:coverage": "jest --runInBand --coverage",
+    "test:arch": "node scripts/verify-arch.js",
+    "java:build": "javac -d java-service/bin -sourcepath java-service/src/main/java java-service/src/main/java/com/mochi/kitchen/Main.java",
+    "java:start": "java -cp java-service/bin com.mochi.kitchen.Main",
     "seed:sql": "node scripts/build-seed.js",
     "cf:dev": "wrangler dev",
     "cf:deploy": "wrangler deploy",
@@ -48,6 +52,8 @@
     "jose": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
     "natural": "^8.2.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1",
     "umzug": "^3.8.2"

@@ -1,9 +1,10 @@
 import { api, hasSession, session } from './api.js';
-import { h, clear, staticSvg } from './ui.js';
+import { h, clear } from './ui.js';
 import { state, setUser, subscribe, clearPicks } from './state.js';
-import { mochi, petal } from './art.js';
 import { icon, emptyState } from './components.js';
 import { makeList, today } from './actions.js';
+import { mountReact } from './react.js';
+import { FloatingKitchenAmbiance } from './kitchenVibe.js';
 import { searchView } from './views/search.js';
 import { recipeView } from './views/recipe.js';
 import { favouritesView } from './views/favourites.js';
@@ -90,37 +91,26 @@ async function render() {
   window.scrollTo({ top: 0 });
 }
 
-function petals() {
-  const box = h('div', { class: 'petals', 'aria-hidden': 'true' });
-  for (let i = 0; i < 9; i += 1) {
-    const p = staticSvg(petal);
-    p.style.left = `${(i * 11 + (i % 3) * 5) % 100}%`;
-    p.style.animationDuration = `${14 + (i % 5) * 4}s`;
-    p.style.animationDelay = `${-(i * 3.1)}s`;
-    p.style.width = p.style.height = `${14 + (i % 3) * 5}px`;
-    box.append(p);
-  }
-  document.body.append(box);
-}
-
 function buildShell() {
   const app = document.getElementById('app');
+  const ambianceHost = h('div', { id: 'floating-ambiance-host' });
   app.append(
     h('a', { class: 'skip-link', href: '#main' }, 'Skip to content'),
+    ambianceHost,
     h('div', { class: 'shell' },
       h('header', { class: 'topbar' },
         h('a', { class: 'brand', href: '#/', 'aria-label': 'Mochi Kitchen home' },
-          staticSvg(mochi('smile', 52)),
-          h('span', {}, h('span', { class: 'brand-name' }, 'Mochi Kitchen'), h('span', { class: 'brand-jp' }, 'モチ キッチン · 모찌 주방'))),
+          h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, 'MK'),
+          h('span', {}, h('span', { class: 'brand-name' }, 'Mochi Kitchen'), h('span', { class: 'brand-jp' }, 'Recipe studio'))),
         userNav, mainNav),
       main,
-      h('footer', { class: 'foot' }, 'Made with love and a little rice. ご飯は愛 · 밥은 사랑')),
+      h('footer', { class: 'foot' }, 'Thoughtful cooking. Better meals.')),
     cartBar);
+  mountReact(FloatingKitchenAmbiance, ambianceHost);
 }
 
 async function start() {
   buildShell();
-  petals();
   subscribe(() => { drawUser(); drawCart(); });
   window.addEventListener('hashchange', render);
   window.addEventListener('mochi:logout', () => { setUser(null); location.hash = '#/login'; });
