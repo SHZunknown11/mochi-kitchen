@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { h, clear, toast, plural } from '../ui.js';
+import { h, clear, toast, plural, staticSvg } from '../ui.js';
 import { state } from '../state.js';
 import { icon, recipeCard, emptyState, loading } from '../components.js';
 import { mountReact } from '../react.js';
@@ -173,10 +173,21 @@ export function searchView(root) {
 
   root.append(h('section', { class: 'page' },
     h('div', { class: 'hero' },
-      h('div', {},
-        h('p', { class: 'eyebrow' }, 'Recipe finder & studio'),
-        h('h1', {}, 'Find your next great meal.'),
-        h('p', { class: 'muted' }, 'Search by craving, use what is already in your kitchen, or explore delicious beef-free recipes.'))),
+      h('div', { class: 'hero-copy' },
+        h('h1', {}, 'What’s hitting the pan tonight?'),
+        h('p', { class: 'muted' }, 'Name the craving, empty the fridge, or set your macros. We’ll find the meal.')),
+      staticSvg(`<svg class="skillet" viewBox="0 0 320 220" aria-hidden="true">
+<g class="steam" fill="none" stroke="#EDE6DA" stroke-width="5" stroke-linecap="round" opacity=".55"><path d="M120 70c-14-14 14-22 0-38"/><path d="M160 64c-14-14 14-22 0-38"/><path d="M200 70c-14-14 14-22 0-38"/></g>
+<ellipse cx="150" cy="176" rx="118" ry="16" fill="#000" opacity=".35"/>
+<path d="M36 112h228l-14 52a30 30 0 0 1-29 22H79a30 30 0 0 1-29-22z" fill="#2A2522" stroke="#4A423C" stroke-width="3"/>
+<ellipse cx="150" cy="112" rx="114" ry="20" fill="#14110F" stroke="#4A423C" stroke-width="3"/>
+<path d="M262 112l54-8c6 0 6 14 0 16l-54 6z" fill="#2A2522" stroke="#4A423C" stroke-width="3"/>
+<path d="M80 108c8-16 40-22 70-20s58 6 66 20c-8 10-40 16-70 16s-58-6-66-16z" fill="#7A2E1B"/>
+<path d="M92 108c10-10 36-14 58-13s46 4 56 13" fill="none" stroke="#C4572B" stroke-width="4" stroke-linecap="round"/>
+<path d="M104 112l22 4M132 110l22 5M160 110l22 4" stroke="#14110F" stroke-width="4" stroke-linecap="round"/>
+<g class="flame"><path d="M70 186c-22-18-8-40 4-50 0 12 10 16 14 8 4 14 18 22 12 42-4 8-22 8-30 0z" fill="#E8531F"/><path d="M76 186c-10-10-2-22 6-28 0 8 6 10 9 5 2 8 9 12 5 22-3 5-15 5-20 1z" fill="#F4A62A"/></g>
+<g class="flame f2"><path d="M232 190c-20-16-6-38 6-46 0 10 8 14 12 7 4 12 16 20 10 38-4 7-20 7-28 1z" fill="#E8531F"/><path d="M238 190c-9-9-1-20 6-25 0 7 5 9 8 4 2 7 8 11 4 20-3 4-14 4-18 1z" fill="#F4A62A"/></g>
+</svg>`)),
     kitchenBarHost,
     h('div', { class: 'card searchbox' }, tabsEl, panels.text, panels.ingredients, panels.diet, filterBox),
     results));

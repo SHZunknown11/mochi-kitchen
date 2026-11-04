@@ -101,10 +101,10 @@ function buildShell() {
       h('header', { class: 'topbar' },
         h('a', { class: 'brand', href: '#/', 'aria-label': 'Mochi Kitchen home' },
           h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, 'MK'),
-          h('span', {}, h('span', { class: 'brand-name' }, 'Mochi Kitchen'), h('span', { class: 'brand-jp' }, 'Recipe studio'))),
+          h('span', {}, h('span', { class: 'brand-name' }, 'Mochi Kitchen'), h('span', { class: 'brand-jp' }, 'Cook hard. Eat well.'))),
         userNav, mainNav),
       main,
-      h('footer', { class: 'foot' }, 'Thoughtful cooking. Better meals.')),
+      h('footer', { class: 'foot' }, 'Fire. Salt. Repeat.')),
     cartBar);
   mountReact(FloatingKitchenAmbiance, ambianceHost);
 }
